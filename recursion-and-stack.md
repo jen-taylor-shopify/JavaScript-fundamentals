@@ -1,18 +1,19 @@
-# Recursion and Stack
---- 
+# Recursion and Stack 
 
 ## What is it?
 
 ### TL:DR;
 
-- Recursion is a programming pattern that is not exclusive to Javscript.
-- When a function solves a task, it can call other functions in the process. When a function calls _itself_, its called _recursion_.
+- When a function solves a task, it can call other functions in the process. And when a function calls _itself_, its called _recursion_.
+- So, recursion is a programming pattern that means calling a function from itself. (This pattern is not exclusive to JavaScript).
+- It is used to write _elegant_ code (simple and easy to maintain).
+- 
 
 ### How does it work? 
 
 There are two ways to accomplish the same task - iterative and recursive.
 
-#### Iterative thinking
+#### Iterative approach
 
 ##### What 
 Uses a `for` loop to iterate over the result multiple times.
@@ -33,7 +34,7 @@ console.log( pow(2, 3) ); // 8
 
 ##### How  
 
-A `for` loop uses a loop algorithm to execute a `for ` statement part-by-part. 
+A `for` loop uses a loop algorithm to execute a `for` statement part-by-part. 
 
 The statement `for (let i = 0; i < 3; i++)` results in the following executions: 
 - begin `i = 0`: this executes once when the loop is entered
@@ -42,6 +43,7 @@ The statement `for (let i = 0; i < 3; i++)` results in the following executions:
 - step `i++` executes after the `body` on each iteration
 
 Which step-by-step looks like this for `(pow 2, 3)`: 
+- Execution context stores `x = 2, n = 3` 
 - Run `begin: i = 0`
 - Check `condition: i < n`
 - Run `body`
@@ -56,9 +58,7 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 - End loop, `return` the result.  
 
 
-
-
-#### Recursive thinking
+#### Recursive approach
 
 ##### What 
 Uses a function that (recursively) calls _itself_ multiple times.
@@ -82,31 +82,55 @@ When the function is called it splits into two branches:
 - 1. base: if `(n == 1)` then it immediately knows that the result will be `x`. Nothing else needs to be executed. 
 - 2. recursive step: if the first statement is false, then we can create a simple action that causes the function to call itself, reducing `n` until it reaches 1.
 
+**An important note:** 
+- Every function has one execution context associated with it. 
+- When a function makes a nested call:
+   -  the current function is paused 
+   -  the execution context it put into the execution context stack
+   -  The nested call executes
+   -  The nested call ends and the old execution context is retrieved from the stack
+   -  The outer function continues from where it paused
+
 Which step-by-step looks like this for `(pow 2, 3)`: 
+- Execution Context stores `x = 2, n = 3`
+- Check `condition: n == 1` (which is falsey)
+- Runs body of the `else` statement which makes a nested call. This pauses the current execution context, and adds it to the stack. 
+- A new execution context is created in the subcall with `x = 2, n = 2`
+- Check `condition: n == 1` (which is falsey)
+- Runs body of the `else` statement which makes a nested call. This pauses the current execution context, and adds it to the stack. 
+- A new execution context is created in the subcall with `x = 2, n = 1`
+- Check `condition: n == 1` (which is now truthy)
+- Returns `2`
+- Removes this execution context from the memory/stack and resume previous execution context from paused point
+- Returns `4`
+- Removes this execution context from the memory/stack and resume previous execution context from paused point
+- Returns `8`
 
+## What are the benefits?
 
-The recursive method reduces a function call to a simpler function on each loop, until the result becomes obvious, and then – to even more simpler, and so on, until the result becomes obvious.
+### 1. Recursive functions have a limit
+- A recursive function always has a condition that stops the function from calling itself, whereas an iterative approach can lead to infinite loops.
+- The JavaScript engine also limits the maximal recursion depth (how many times thte function can call itself). It is usually ~10,000 give or take. 
 
+### 2. Recursive functions are easy to maintain
+- Code is often short, simple, and therefore easier to maintain 
+- You can clean them up by using a ternery statement to futher simplify it!
 
+### 3. Recursive traversal
+- Iterating over data structures with nested data might require you to write nested subloops, which can get messy really quickly
+- Recursion allows you to split similar tasks into smaller subtasks while keeping the code simple and easy to maintain
 
+## What are the drawbacks?
 
+### 1. Recursive functions require memory
+- Iterative functions like loops usually require less memory since they execute in a single execution context. Their memory requirements are small and fixed.
+- Recursive functions require multiple execution contexts which requires more memory.
 
-
-## What are the benefits? Or in what context would you want to use this?
-
-Recursion is useful in the following situations: 
-- when a task can be naturally split into several task of the same kind, but simpler
-- when a task can be simplified into aneasy action plus a simpler variant of the same task
-- when working with specific data structures
-
-A recursive function always has a condition that stops the function from calling itself whereas a loop might 
-
-
-
-
-
-## What are the drawbacks? Or in what contexts would you not want to use this?
-
+## When should we use it? 
+- When memory isn't an issue and a re-write as a loop only has trivial optimizations
+- When a task can be split into several small tasks of the same kind
+- When working with nested data structures
+- When working with recursively-defined data structures
 
 ## If applicable show an example of its use in Shopify marketing.
 
