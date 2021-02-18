@@ -1,4 +1,4 @@
-# Recursion and Stack 
+# Recursion
 
 ## What is it?
 
