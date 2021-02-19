@@ -162,7 +162,10 @@ console.log(factorial(6)); // 720
 - When memory isn't an issue and a re-write as a loop only has trivial optimizations
 - When a task can be split into several small tasks of the same kind with different parameters
 - When working with nested data or non-linear data structures
-- 
+- When you don't know how many times you need to perform the 
+
+## When should we _not_ use it?
+- Don't prematurely optimize / overengineer something that has really straightforward number of iterations.
 
 ## If possible show an example of its use in a Shopify marketing repository.
 
