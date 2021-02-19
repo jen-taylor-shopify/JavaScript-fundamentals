@@ -105,15 +105,43 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 - Removes this execution context from the memory/stack and resume previous execution context from paused point
 - Returns `8`
 
+
 ## What are the benefits?
 
-### 1. Recursive functions have a limit
-- A recursive function always has a condition that stops the function from calling itself, whereas an iterative approach can lead to infinite loops.
-- The JavaScript engine also limits the maximal recursion depth (how many times the function can call itself). It is usually ~10,000 give or take. 
-
-### 2. Recursive functions are easy to maintain
+### 1. Recursive functions are easy to maintain
 - Code is often short, simple, and therefore easier to maintain 
 - You can clean them up by using a ternery statement to futher simplify it!
+
+### 2. Recursive functions don't require us to track state with variables
+- In an iterative loop, we typically use local variables to set and and track state. This has the danger of producing side effects.
+- Recursive functions allow us to avoid using variables to manage state. Therefore there is no danger of side effects.
+- Recursive exitucily and cleanly when they get to their terminal case. Since the function tests the value of the argument being passed in to the function immediately, before it does any further calculations, it reduces the chances of side effects.
+
+Example of iterative approach that modifies state of variables:
+```
+var factor = function(number) {
+  var result = 1;
+  var count;
+  for (count = number; count > 1; count--) {
+    result *= count;
+  }
+  return result;
+};
+console.log(factor(6)); // 720
+```
+
+Example of recursive approach that does not need to modify state with variables:
+```
+var factorial = function(number) {
+  if (number <= 0) {
+    return 1;
+  } else {
+    return (number * factorial(number - 1));
+  }
+};
+console.log(factorial(6)); // 720
+```
+
 
 ### 3. Recursive traversal
 - Iterating over data structures with nested data might require you to write nested subloops, which can get messy really quickly
@@ -126,10 +154,15 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 - Iterative functions like loops usually require less memory since they execute in a single execution context. Their memory requirements are small and fixed.
 - Recursive functions require multiple execution contexts which requires more memory.
 
+### 2. Recursive functions can be called indefinitely
+- Like iterative loops, a recursive function without an `if...else` statement or some sort of "setter" condition can end up calling itself indefinitely.
+- The JavaScript engine will limit the maximal recursion depth (how many times the function can call itself). It is usually ~10,000 (give or take). 
+
 ## When should we use it? 
 - When memory isn't an issue and a re-write as a loop only has trivial optimizations
-- When a task can be split into several small tasks of the same kind
-- When working with nested data structures
+- When a task can be split into several small tasks of the same kind with different parameters
+- When working with nested data or non-linear data structures
+- 
 
 ## If possible show an example of its use in a Shopify marketing repository.
 
@@ -137,3 +170,5 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 ## Resources
 - https://javascript.info/recursion
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#recursion
+- https://www.programiz.com/javascript/recursion
+- https://www.sitepoint.com/recursion-functional-javascript/
