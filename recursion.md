@@ -7,7 +7,6 @@
 - When a function solves a task, it can call other functions in the process. And when a function calls _itself_, its called _recursion_.
 - So, recursion is a programming pattern that means calling a function from itself. (This pattern is not exclusive to JavaScript).
 - It is used to write _elegant_ code (simple and easy to maintain).
-- 
 
 ### How does it work? 
 
@@ -110,7 +109,7 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 
 ### 1. Recursive functions have a limit
 - A recursive function always has a condition that stops the function from calling itself, whereas an iterative approach can lead to infinite loops.
-- The JavaScript engine also limits the maximal recursion depth (how many times thte function can call itself). It is usually ~10,000 give or take. 
+- The JavaScript engine also limits the maximal recursion depth (how many times the function can call itself). It is usually ~10,000 give or take. 
 
 ### 2. Recursive functions are easy to maintain
 - Code is often short, simple, and therefore easier to maintain 
@@ -119,6 +118,7 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 ### 3. Recursive traversal
 - Iterating over data structures with nested data might require you to write nested subloops, which can get messy really quickly
 - Recursion allows you to split similar tasks into smaller subtasks while keeping the code simple and easy to maintain
+- An example of this is traversing a tree structure (like the DOM). It is much cleaner to use a recursive function than nesting iterative loops.
 
 ## What are the drawbacks?
 
@@ -130,11 +130,10 @@ Which step-by-step looks like this for `(pow 2, 3)`:
 - When memory isn't an issue and a re-write as a loop only has trivial optimizations
 - When a task can be split into several small tasks of the same kind
 - When working with nested data structures
-- When working with recursively-defined data structures
 
-## If applicable show an example of its use in Shopify marketing.
+## If possible show an example of its use in a Shopify marketing repository.
 
 
 ## Resources
 - https://javascript.info/recursion
-- 
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#recursion
