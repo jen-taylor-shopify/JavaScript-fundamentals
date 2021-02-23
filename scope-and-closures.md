@@ -15,4 +15,4 @@ JavaScript is a **compiled language**. What does that mean?
 	- `var a=2;` becomes `var`, `a`, `=`, `2`, `1=;`
 - **Step 2: Parsing**: takes the array of tokens and turns it into a tree of nested elements (Abstract Syntax Tree (AST)).
 	
-![Example Abstract Syntax Tree](/images/AST.jpg)
+![Example Abstract Syntax Tree](AST.png)
