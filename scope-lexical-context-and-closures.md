@@ -1,11 +1,11 @@
-# Scope and Closures
+# Scope, Lexical Context, and Closures
 
 ## Scope
 
 ### Remember
 - **State**: The variables used to store and retrieve values (creates _state_)
 - **Scope**: The set of rules that dictates how we store variables and find those variables at a later time (called _scope_) 
-- JavaScript is a function-oriented language which means you can create a function at any moment!
+- JavaScript is a **function-oriented language** which means you can create a function at any moment!
 	- Functions can access "outer variables" (variables outside of the function)
 
 ### Code Blocks
