@@ -76,7 +76,7 @@ alert( counter() ); // 2
 	- The reference to its **outer lexical environment** will be `null` because it is already the outermost environment.
 
 - The **global lexical environment** changes during the execution of the code
-	- Which means the properties of the **environment record** object change as the JS engine works through the code. 
+	- Which means the properties of the **environment record** object change as the JS engine works through the code because some of the properties aren't immediately available. 
 	- For example: 
 	```
 		let phrase;
@@ -95,4 +95,143 @@ alert( counter() ); // 2
 - A function is also a value (like a variable)
 - BUT a function declaration is **instantly fully initialized** 
 
-- When a lexical environment 
+- When a lexical environment is created, a **Function Declaration is immediately ready to use**
+```
+let phrase = "hello";
+
+function say(name) {
+	alert(`$(phrase), $(name)`);
+}
+```
+1. `phrase: uninitialized, say: function`: When the script starts the lexical environment saves the variable `phrase` in an `uninitialized` state. The function, however, is saved immeidately.
+
+- What happens if the function is assigned to a variable as a **Function Expression**? 
+	- Function Expressions behave like variables, and **will not** be instantly fully initialized
+
+### Step 3: Inner and Outer Lexical Environment
+- When a function runs, a new lexical environment is created.
+- Like the global lexical environment, this new lexical environment is an object where variables are stored as properties.
+
+**Example**
+```
+let phrase = "hello";
+
+function say(name) {
+	alert(`$(phrase), $(name)`);
+}
+
+say("Jen");
+```
+1. The **outer lexical environment** is created with the `say: function`, and `phrase: "hello"` properties.
+2. The **inner lexical environment** is related to the _current_ execution of `say` and  has the `name` property. The value of `name` becomes `John`. It also has a reference to the **outer lexical environment**. 
+
+In the example above, the code is looking for the `phrase` variable.
+	- First it searches the **inner lexical environment**
+	- If its not there, it searches the **outer lexical environment**, (and so on until it reaches the global one)
+	- If the variable isn't found one of two things can happen: 
+		- If you're in `use strict` mode an error will be triggered
+		- If you're not in `use strict` mode, a new global variable will be created.
+
+**🎨 Visual example:**
+- An apartment building is the "**global lexical environment**". 
+- It contains multiple "floors" which are the other "lexical environments".
+- If you are searching for your friend, you start on the first floor (the inner most lexical environment), and keep going up a floor until you find them.
+
+### Step 4: Returning a function
+
+Lets use this example: 
+```
+function makeCounter() {
+  let count = 0;
+
+  return function() {
+    return count++;
+  };
+}
+
+let counter = makeCounter();
+
+alert( counter() );
+```
+
+1. The **outer lexical environment** is created.
+   - Properties `makeCounter: function` and `counter: undefined` created.
+   - The "outer lexical environment" reference is null because this is the global lexical environment.
+2. The **inner lexical environment** of the `makeCounter()` call is created to store variables.
+   - Properties `count: 0` created
+   - A tiny nested function is created for `return count++`, and it remembers that it was created inside this specific lexical environment.
+   - The "outer lexical environment" reference  is the `global` lexical environment
+3. ANOTHER **inner lexical environment** is created when `counter()` is called for the `return` function.
+   - It's "outer lexical environment" reference is the `makeCounter()` lexical environment
+4. When `counter()` is called, the `count++` looks inside its own lexical environment for a `count` variable. It doesn't exist there, so it goes up a level and searches the `makeCounter()` environment for a `count` variable. It exists and the function makes the change **where it finds the variable.**
+   - **Remember:**  the variable is alwasy updated in the **lexical environment** where it lives.
+
+**🎨 Visual Example**
+Think of each lexical context like a bubble. 
+- Each new lexical scope is a new bubble inside the parent bubble.
+- A bubble cannot overlap with another bubble, its either in or out. 
+
+### What are the benefits of this lexical environment scope?
+
+**1. You can write DRY by creating re-usable functions**
+- Because each invocation of a component creates a new lexical environment in JS, you can re-use functions without worrying about polluting the scope.
+- If you have an instance like this: 
+```
+function makeCounter() {
+  let count = 0;
+
+  return function() {
+    return count++;
+  };
+}
+
+let counter = makeCounter();
+let counter2 = makeCounter();
+
+alert( counter() ); // 0
+alert( counter() ); // 1
+
+alert( counter2() ); // ?
+alert( counter2() ); // ?
+```
+- `let counter` creates one lexical environment and `let counter2` creates a second lexical environment. They may call the same function, but they are different invocations so they are independent of one another.
+
+
+
+### What are the drawbacks of this lexical environment scope?
+
+**1. Technically you _can_ cheat the lexical scope**
+- You can use an `eval()` function (which takes a string as an argument) and cheat the lexical scope.
+
+Example: 
+```
+function foo(str, a) {
+	eval( str ); // cheating!
+	console.log( a, b );
+}
+
+var b = 2;
+
+foo( "var b = 3;", 1 ); // 1 3
+```
+- This strategy can be used to _dynamically_ modify the lexical scope.
+- Its bad practice _and_ it negatively impacts performance because it subverts the JS engine's automatic performance optimizations
+
+
+## Closures
+
+**Closure:** a function that remembers its outer variables and can access them. 
+	- In JavaScript, all functions are naturally closures.
+	- They automatically remember where they were created by storing this information in the environment property
+
+
+## Garbage Collection
+When a function finishes
+- In most cases that that lexical environment and all variables are removed from memory to clear up space.
+- If there's a nested function that is "still reachable" after the end of the function, then it will stay alive
+
+**TL;DR** A lexical environment dies when it becomes unreachable. It only exists while there is a reference ot it. 
+
+## Resources
+- https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch2.md
+- 
