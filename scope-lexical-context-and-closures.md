@@ -2,13 +2,13 @@
 
 ## Scope
 
-### Remember
+### Before we get started:
 - **State**: The variables used to store and retrieve values (creates _state_)
 - **Scope**: The set of rules that dictates how we store variables and find those variables at a later time (called _scope_) 
 - JavaScript is a **function-oriented language** which means you can create a function at any moment!
 	- Functions can access "outer variables" (variables outside of the function)
 
-### Code Blocks
+**Code Blocks**
 - If a variable is declared inside a code block `{...}`, its only visible inside that block 
 ```
 {
@@ -33,31 +33,11 @@ if (true) {
 alert(phrase); // Error, no such variable!
 ```
 
-## Nested Functions
+**Nested Functions**
 - Sometimes we write functions inside another function.
 - Nested functions can access "outer variables" from the parent function.
 - A nested function can be returned as a **property of a new object** or as **a result by itself**
 
-But what happens when...
-- You have a nested function like the one below? 
-- If we create multiple counters, will they be independent? 
-- What’s going on with the variables here?
-
-```
-function makeCounter() {
-  let count = 0;
-
-  return function() {
-    return count++;
-  };
-}
-
-let counter = makeCounter();
-
-alert( counter() ); // 0
-alert( counter() ); // 1
-alert( counter() ); // 2
-```
 
 ## Lexical Environment
 
@@ -173,7 +153,7 @@ Think of each lexical context like a bubble.
 
 ### What are the benefits of this lexical environment scope?
 
-**1. You can write DRY by creating re-usable functions**
+**1. You can keep code DRY by creating re-usable functions**
 - Because each invocation of a component creates a new lexical environment in JS, you can re-use functions without worrying about polluting the scope.
 - If you have an instance like this: 
 ```
@@ -196,7 +176,14 @@ alert( counter2() ); // ?
 ```
 - `let counter` creates one lexical environment and `let counter2` creates a second lexical environment. They may call the same function, but they are different invocations so they are independent of one another.
 
+**2. You can write clean code by adhering to the "Principle of least priviledge"**
+- Also supports "Principle of least priviledge" software design principle which states that you should expose only what is minimally necessary, and "hide" everything else. 
+- If all variables were available in the global scope, they would be available to all nested scopes. But this can have unintended side effects. So its good practice to keep variables limited to the scopes that they are needed/used in.
 
+**3. You can avoid collisions**
+- Hiding variables and functions inside a scope helps you avoid collisions between two different identifiers with the same name but different usages.
+- (This often happens when you unexpectedly overwrite a value).
+- For example, if you are using multiple libraries that don't have global "namespaces", collisions might occur if internal functions / variables have the same names as another library.
 
 ### What are the drawbacks of this lexical environment scope?
 
