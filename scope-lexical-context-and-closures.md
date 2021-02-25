@@ -1,19 +1,24 @@
 # Scope, Lexical Context, and Closures
 
-## Scope
+-[Scope](#scope)
+-[Lexical Context](#lexical_context)
 
-### Before we get started:
-- **State**: The variables used to store and retrieve values (creates _state_)
-- **Scope**: The set of rules that dictates how we store variables and find those variables at a later time (called _scope_) 
+Before we start lets define a few terms and concepts: 
+- **Variables**: Store values.
+- **State**: The variables used to store and retrieve values creates _state_
+- **Scope**: The set of rules that dictates _how_ we store variables and find those variables at a later time (called _scope_). 
 - JavaScript is a **function-oriented language** which means you can create a function at any moment!
 	- Functions can access "outer variables" (variables outside of the function)
+---
 
-**Code Blocks**
+## Scope
+
+**TL;DR** In JavaScript, **scope** is the set of rules that dictates _how_ we store variables and find those variables at a later time.
+
+### Scope in Code Blocks
 - If a variable is declared inside a code block `{...}`, its only visible inside that block 
 ```
 {
-  // do some job with local variables that should not be seen outside
-
   let message = "Hello"; // only visible in this block
 
   alert(message); // Hello
@@ -22,42 +27,35 @@
 alert(message); // Error: message is not defined	
 ```
 - We use this to isolate a piece of code that performs a specific task, with variables that belong only to that task.
-- Variables declared in an `if`, `for`, or `while` block are only visible inside that block.
-```
-if (true) {
-  let phrase = "Hello!";
+- Similarly, variables declared in an `if`, `for`, or `while` block are also only visible inside that block.
 
-  alert(phrase); // Hello!
-}
-
-alert(phrase); // Error, no such variable!
-```
-
-**Nested Functions**
+### Scope in Nested Functions
 - Sometimes we write functions inside another function.
 - Nested functions can access "outer variables" from the parent function.
-- A nested function can be returned as a **property of a new object** or as **a result by itself**
-
+- A nested function can be returned as a **property of a new object** or as **a result by itself** (we will clarify this below)
+----
 
 ## Lexical Environment
 
-### Step 1. Variables
+To understand **scope** you need to understand the **lexical environment**. 
+**TL;DR** Every running function, code block, and script asa whole has an object known as the _lexical environment_.
 
-- Every running function, code block, and script asa whole has an object known as the _lexical environment_.
+### What is the lexical environment?
+The **Lexical Environment** consists of two parts: 
+	1. **Environment Record** - an object that stores all the local variables as its properties (and other info like the value of `this`)
+	2.	Reference to the **outer lexical environment** - a reference to the outer code
 
-- The **Lexical Environment** consists of two parts: 
-	- **Environment Record** - an object that stores all the local variables as its properties (and other info like the value of `this`)
-	-	Reference to the **outer lexical environment** - a reference to the outer code
+1. The **Environment Record**
+	- A **variable** is a property of the environment record 
+	- When you change a variable, you really change a _property of_ that environment record
 
-- A **variable** is a property of the **Environment Record**
-	- When you change a variable, you really change a property of that environment record
+2. The **Reference to the outer lexical environment**  
+	- The **Global Lexical Environment** is the outermost lexical environment. It encompasses the entire script so it's reference to the outer lexical environment will be `null`.
+	- When a lexical environment is nested inside the global lexical environment, its reference to the outer lexical environment will point to its parent lexical context
 
-- **Global Lexical Environment** - is associated with the entire script. 
-	- The reference to its **outer lexical environment** will be `null` because it is already the outermost environment.
-
-- The **global lexical environment** changes during the execution of the code
-	- Which means the properties of the **environment record** object change as the JS engine works through the code because some of the properties aren't immediately available. 
-	- For example: 
+The **global lexical environment** changes during the execution of the code. 
+	- This means the properties of the **environment record** object change as the JS engine works through the code because some of the properties aren't immediately available. 
+This is a tricky concept so lets look at the following example to understand:
 	```
 		let phrase;
 		phrase = "hello"
@@ -204,6 +202,72 @@ foo( "var b = 3;", 1 ); // 1 3
 - This strategy can be used to _dynamically_ modify the lexical scope.
 - Its bad practice _and_ it negatively impacts performance because it subverts the JS engine's automatic performance optimizations
 
+## Hoisting 
+
+JavaScript is not executed top-down, line-by-line.  
+```
+a = 2;
+
+var a;
+
+console.log( a );
+```
+In the previous example we might expect the console.log to return `undefined` since the declaration statement comes after the assignment. 
+_Nope_.
+- unlike other languages that are pre-compiled, the engine actually **compiles** our JavaScript code **right before** it interprets it
+- part of this compilation phase involves finding and associating all declarations with their appropriate scopes
+- all declarations, both variables and functions, are processed **first**, _before_ any part of the code is executed
+- SO 
+	- during the **compilation phase** the JS engine sees the `var a` declaration
+	- during the **execution phase** the JS sees the assignment `a = 2`
+- NOTE: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
+
+**🎨 Visual example**
+- think of the JS engine "reorganizing" the code during the compilation process, moving it from where it appears in the code to the very top.
+- Again, remember: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
+
+#### Function declarations vs. Function expresssions
+
+**Function Declaration:**
+```
+foo();
+
+function foo() {
+	console.log( a ); // undefined
+
+	var a = 2;
+}
+```
+- the function call `foo()` still executes as expected because `function foo() {...}` is a declaration and is already _seen_ by the JS engine during the compilation process.
+
+
+**Function Expressions:**
+Function expressions are NOT hoisted because they are an assignment. 
+```
+foo(); // TypeError!
+
+var foo = function bar() {
+	// ...
+};
+```
+- the function call `foo()` is a TypeError because the declaration `var foo` is seen 👀 during the compilation phase, but the value is _not_ seen 👀 until the execution phase.
+- `foo()` is attempting to invoke the undefined value, which is a `TypeError` illegal operation
+- ALSO remember that because the name identifier `bar()` is on the RHS of this declaration, it is not available at the `var foo` scope! It could more accurately be depicted like this: 
+```
+foo = function() {
+	var bar = ...self...
+	// ...
+}
+```
+
+#### Function First
+- functions and variable declarations are hosited.
+- BUT functions are hoisted FIRST
+	- (Remember that subsequent function declarations do override previous ones though)
+
+### What are the drawbacks? 
+- duplicate definitions in the same scope are a really bad idea and will often lead to confusing results.
+- Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
 
 ## Closures
 
@@ -221,4 +285,5 @@ When a function finishes
 
 ## Resources
 - https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch2.md
-- 
+- https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch4.md
+- https://javascript.info/closure
