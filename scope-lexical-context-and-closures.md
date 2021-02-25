@@ -271,9 +271,49 @@ var baz = foo();
 
 baz(); // 2 -- Whoa, closure was just observed!
 ```
-1. The function `bar()` has lexical scope access to its parent lexical environment, `foo()`
-2. But if we pass `bar()` as a _value_ to 
+- The function `bar()` has lexical scope access to its parent lexical environment, `foo()`
+- But then we `return bar`, which means technically we are passing it _as_ a value. It returns the function object itself that `bar` references.
+- Once `foo()` is executed, we assign the value it returned (the inner `bar()` function) to the variable `baz` (`var baz = foo()`)
+- Then we invoke `baz()`, which invokes `foo()`, which invokes `bar()` (but by a _different_ reference) 
+	- So `bar()` is executed from _outside_ its lexical context because invoking `baz()` >> invokes `foo()` >> which invokes `bar()` by `return bar`.
 
+- Usually when the JS is done executing `foo()` the Garbage Collector would come along and free up memory by throwing away `foo()`'s inner scope.
+	- **BUT** closures do not let this happen
+	- WHY? The scope of `foo()` is still "in use" because the function `bar()` is still using it!
+	- HOW? `bar()` has a lexical scope that references the inner scope of `foo()`. This needs to be kept alive for `bar()` to reference at a later time.
+	- SO? The function is being invoked well outside of its author-time lexical scope. **Closure** lets the function continue to access the lexical scope it was defined in at author-time.
+
+- 🤯 **TL;DR** any of the various ways that functions can be passed around as values, and indeed invoked in other locations, are all examples of observing/exercising closure.
+
+**Example 3:**
+```
+function wait(message) {
+
+	setTimeout( function timer(){
+		console.log( message );
+	}, 1000 );
+
+}
+
+wait( "Hello, closure!" );
+```
+- This example has an inner function called `timer()` that is passed to the `setTimeout()` function
+- `timer()` has a scope closure over the scope of `wait()` because setTimeout invokes
+
+
+```
+for (var i=1; i<=5; i++) {
+	setTimeout( function timer(){
+		console.log( i );
+	}, i*1000 );
+}
+
+// the console.log prints "6" out 5 times at 1-second intervals
+```
+- The terminating condition of the `for` loop is when `i` is not `<=5` (`i > 5`)
+- We would _expect_ each iteration fo the loop to capture its own copy of `i` at the time of the iteration
+- BUT all 5 function iterations share the same global scope, which only has 1 `i` in it.
+- SO 
 
 
 
