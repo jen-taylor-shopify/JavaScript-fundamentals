@@ -1,7 +1,8 @@
 # Scope, Lexical Context, and Closures
 
--[Scope](#scope)
--[Lexical Context](#lexical_context)
+- [Scope](#scope)
+- [Lexical Context](#lexical_context)
+- 
 
 Before we start lets define a few terms and concepts: 
 - **Variables**: Store values.
@@ -55,42 +56,55 @@ The **Lexical Environment** consists of two parts:
 
 The **global lexical environment** changes during the execution of the code. 
 	- This means the properties of the **environment record** object change as the JS engine works through the code because some of the properties aren't immediately available. 
-This is a tricky concept so lets look at the following example to understand:
+	- This is a tricky concept so lets look at the following example to understand:
 	```
 		let phrase;
 		phrase = "hello"
 	```
-1. `phrase: uninitialized`: When the scrip starts, the lexical environment is pre-populated with all of the variables, but they are in an `uninitialized` state. The engine knows about the variable but it hasn't been declared yet. 
-2. `let phrase`: Then the `let` definition appears. There is no assignment yet, so it is now `undefined`.
-3. `phrase = "hello";`: Now the phrase has an assigned value of the string `"hello"`.
+	- When the script starts, the lexical environment is pre-populated with all of the variables but they are in an `uninitialized` state. The engine knows about the `phrase` variable but it hasn't been declared yet (`phrase: uninitialized`). 
+	- Then the `let` definition appears. There is no assignment yet, so it is now `undefined`.
+	- Next the assignment is evaluated and the JS engine understands that the string `hello` has been assigned to the `phrase` variable. 
 
-**A few reminders**
-- The lexical environment is a **"specification object"** which means it only exists only "theoretically" (We can't actually call the object in our code and manipulate it directly).
-- JavsScript engines may optimize the lexical environment and discard variables (properties) that are unused to save memory and perform other tasks.
+The lexical environment is a **"specification object"** which means it only exists only "theoretically".
+	- This means we can't actually call the object in our code and manipulate it directly.
 
-### Step 2: Function Declarations
+Unused lexical environments and properties are "thrown out" because JavaScript has **garbage collection**.
+	- JavsScript engines may optimize the lexical environment and discard variables (properties) that are unused to save memory and perform other tasks.
 
-- A function is also a value (like a variable)
-- BUT a function declaration is **instantly fully initialized** 
+### Functions
 
-- When a lexical environment is created, a **Function Declaration is immediately ready to use**
+**TL;DR** Functions are nuanced and have a few particularities that effect how they are treated in the lexical environment.
+
+#### Function Declarations
+- A function is also a value (like a variable) BUT a function declaration is **instantly fully initialized** 
+- When a lexical environment is created, a **function declaration is immediately ready to use**
+- Lets look at the following example to understand:
 ```
 let phrase = "hello";
 
 function say(name) {
-	alert(`$(phrase), $(name)`);
+	alert($(phrase), $(name)`);
 }
 ```
-1. `phrase: uninitialized, say: function`: When the script starts the lexical environment saves the variable `phrase` in an `uninitialized` state. The function, however, is saved immeidately.
+	- When the script starts the lexical environment saves the variable `phrase` in an `uninitialized` state. The function, however, is saved immeidately (`phrase: uninitialized, say: function`).
 
-- What happens if the function is assigned to a variable as a **Function Expression**? 
-	- Function Expressions behave like variables, and **will not** be instantly fully initialized
+#### Function Expressions
+- If the function is assigned to a variable as a **Function Expression**, it behaaves exactly like a variable and **will not** be instantly fully initialized
+- Lets look at the following example to understand:
+```
+let phrase = "hello";
 
-### Step 3: Inner and Outer Lexical Environment
+let say = function(name) {
+	alert($(phrase), $(name)`);
+}
+```
+- When the script starts the lexical environment saves the variable `phrase` in an `uninitialized` state, and the variable `say` in the `uninitialized` state (`phrase: uninitialized, say: uninitialized`).
+
+### Inner and Outer Lexical Environments
 - When a function runs, a new lexical environment is created.
 - Like the global lexical environment, this new lexical environment is an object where variables are stored as properties.
 
-**Example**
+**Example 1**
 ```
 let phrase = "hello";
 
@@ -101,21 +115,16 @@ function say(name) {
 say("Jen");
 ```
 1. The **outer lexical environment** is created with the `say: function`, and `phrase: "hello"` properties.
-2. The **inner lexical environment** is related to the _current_ execution of `say` and  has the `name` property. The value of `name` becomes `John`. It also has a reference to the **outer lexical environment**. 
+2. The **inner lexical environment** is related to the _current_ execution of `say` and  has the `name` property. The value of `name` becomes `John`. It also has a reference to the **outer lexical environment** (its parent block). 
 
 In the example above, the code is looking for the `phrase` variable.
 	- First it searches the **inner lexical environment**
 	- If its not there, it searches the **outer lexical environment**, (and so on until it reaches the global one)
-	- If the variable isn't found one of two things can happen: 
+	- If the variable isn't found in any of the lexical environments one of two things can happen: 
 		- If you're in `use strict` mode an error will be triggered
 		- If you're not in `use strict` mode, a new global variable will be created.
 
-**🎨 Visual example:**
-- An apartment building is the "**global lexical environment**". 
-- It contains multiple "floors" which are the other "lexical environments".
-- If you are searching for your friend, you start on the first floor (the inner most lexical environment), and keep going up a floor until you find them.
-
-### Step 4: Returning a function
+**Example 2**
 
 Lets use this example: 
 ```
@@ -142,12 +151,94 @@ alert( counter() );
 3. ANOTHER **inner lexical environment** is created when `counter()` is called for the `return` function.
    - It's "outer lexical environment" reference is the `makeCounter()` lexical environment
 4. When `counter()` is called, the `count++` looks inside its own lexical environment for a `count` variable. It doesn't exist there, so it goes up a level and searches the `makeCounter()` environment for a `count` variable. It exists and the function makes the change **where it finds the variable.**
-   - **Remember:**  the variable is alwasy updated in the **lexical environment** where it lives.
+   - **Remember:**  the variable is always updated in the **lexical environment** where it lives.
 
 **🎨 Visual Example**
 Think of each lexical context like a bubble. 
 - Each new lexical scope is a new bubble inside the parent bubble.
 - A bubble cannot overlap with another bubble, its either in or out. 
+
+### Hoisting 
+- JavaScript is not executed top-down, line-by-line. This has implications for the lexical environment _and_ scope.
+- Lets look at an example to understand what this means:
+```
+a = 2;
+
+var a;
+
+console.log( a );
+```
+- Based on what we know about how the lexical environments work, we might expect the `console.log` in the previous example to return `undefined` since the declaration statement comes _after_ the assignment. 
+- _Nope_ 👉 unlike other languages that are pre-compiled, the engine actually **compiles** our JavaScript code **right before** it interprets it
+- part of this compilation phase involves finding and associating all declarations with their appropriate scopes
+- all declarations, both variables and functions, are processed **first**, _before_ any part of the code is executed
+  _SO_
+	- during the **compilation phase** the JS engine sees the `var a` declaration
+	- during the **execution phase** the JS sees the assignment `a = 2`
+
+**🎨 Visual example**
+- think of the JS engine "reorganizing" the code during the compilation process, moving it from where it appears in the code to the very top.
+- Again, remember: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
+
+#### Function declarations vs. Function expresssions
+- Remember: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
+- 
+**Example 1: Function Declaration:**
+```
+foo();
+
+function foo() {
+	console.log( a ); // undefined
+
+	var a = 2;
+}
+```
+- the function call `foo()` still executes as expected because `function foo() {...}` is a declaration and is already _seen_ by the JS engine during the compilation process.
+
+
+**Example 2: Function Expressions:**
+Function expressions are NOT hoisted because they are an assignment. 
+```
+foo(); // TypeError!
+
+var foo = function bar() {
+	// ...
+};
+```
+- the function call `foo()` is a TypeError because the declaration `var foo` is seen 👀 during the compilation phase, but the value is _not_ seen 👀 until the execution phase.
+- `foo()` is attempting to invoke the undefined value, which is a `TypeError` illegal operation
+- ALSO remember that because the name identifier `bar()` is on the RHS of this declaration, it is not available at the `var foo` scope! It could more accurately be depicted like this: 
+```
+foo = function() {
+	var bar = ...self...
+	// ...
+}
+```
+
+#### Functions First
+- functions and variable declarations are hosited.
+- BUT **functions are hoisted FIRST**
+	- Remember that subsequent function declarations do override previous ones though
+
+#### Garbage Collection
+- When a function finishes
+	- In most cases that that lexical environment and all variables are removed from memory to clear up space.
+	- If there's a nested function that is "still reachable" after the end of the function, then it will stay alive
+- A lexical environment dies when it becomes unreachable. It only exists while there is a reference ot it.
+
+## Closures
+
+**TL;DR** A closure is a function that remembers its outer variables and can access them.
+
+In JavaScript, all functions are naturally closures.
+	- They automatically remember where they were created by storing this information in the environment property
+
+
+
+
+
+
+
 
 ### What are the benefits of this lexical environment scope?
 
@@ -202,86 +293,10 @@ foo( "var b = 3;", 1 ); // 1 3
 - This strategy can be used to _dynamically_ modify the lexical scope.
 - Its bad practice _and_ it negatively impacts performance because it subverts the JS engine's automatic performance optimizations
 
-## Hoisting 
-
-JavaScript is not executed top-down, line-by-line.  
-```
-a = 2;
-
-var a;
-
-console.log( a );
-```
-In the previous example we might expect the console.log to return `undefined` since the declaration statement comes after the assignment. 
-_Nope_.
-- unlike other languages that are pre-compiled, the engine actually **compiles** our JavaScript code **right before** it interprets it
-- part of this compilation phase involves finding and associating all declarations with their appropriate scopes
-- all declarations, both variables and functions, are processed **first**, _before_ any part of the code is executed
-- SO 
-	- during the **compilation phase** the JS engine sees the `var a` declaration
-	- during the **execution phase** the JS sees the assignment `a = 2`
-- NOTE: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
-
-**🎨 Visual example**
-- think of the JS engine "reorganizing" the code during the compilation process, moving it from where it appears in the code to the very top.
-- Again, remember: **only the declarations** are hoisted. Assignments and executable logic is always left in place by the JS engine.
-
-#### Function declarations vs. Function expresssions
-
-**Function Declaration:**
-```
-foo();
-
-function foo() {
-	console.log( a ); // undefined
-
-	var a = 2;
-}
-```
-- the function call `foo()` still executes as expected because `function foo() {...}` is a declaration and is already _seen_ by the JS engine during the compilation process.
-
-
-**Function Expressions:**
-Function expressions are NOT hoisted because they are an assignment. 
-```
-foo(); // TypeError!
-
-var foo = function bar() {
-	// ...
-};
-```
-- the function call `foo()` is a TypeError because the declaration `var foo` is seen 👀 during the compilation phase, but the value is _not_ seen 👀 until the execution phase.
-- `foo()` is attempting to invoke the undefined value, which is a `TypeError` illegal operation
-- ALSO remember that because the name identifier `bar()` is on the RHS of this declaration, it is not available at the `var foo` scope! It could more accurately be depicted like this: 
-```
-foo = function() {
-	var bar = ...self...
-	// ...
-}
-```
-
-#### Function First
-- functions and variable declarations are hosited.
-- BUT functions are hoisted FIRST
-	- (Remember that subsequent function declarations do override previous ones though)
-
 ### What are the drawbacks? 
 - duplicate definitions in the same scope are a really bad idea and will often lead to confusing results.
 - Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
 
-## Closures
-
-**Closure:** a function that remembers its outer variables and can access them. 
-	- In JavaScript, all functions are naturally closures.
-	- They automatically remember where they were created by storing this information in the environment property
-
-
-## Garbage Collection
-When a function finishes
-- In most cases that that lexical environment and all variables are removed from memory to clear up space.
-- If there's a nested function that is "still reachable" after the end of the function, then it will stay alive
-
-**TL;DR** A lexical environment dies when it becomes unreachable. It only exists while there is a reference ot it. 
 
 ## Resources
 - https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch2.md
