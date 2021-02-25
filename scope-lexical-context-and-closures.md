@@ -2,7 +2,7 @@
 
 - [Scope](#scope)
 - [Lexical Context](#lexical_context)
-- 
+- [Closures](#closures)
 
 Before we start lets define a few terms and concepts: 
 - **Variables**: Store values.
@@ -225,14 +225,54 @@ foo = function() {
 	- In most cases that that lexical environment and all variables are removed from memory to clear up space.
 	- If there's a nested function that is "still reachable" after the end of the function, then it will stay alive
 - A lexical environment dies when it becomes unreachable. It only exists while there is a reference ot it.
+---
 
 ## Closures
 
 **TL;DR** A closure is a function that remembers its outer variables and can access them.
 
 In JavaScript, all functions are naturally closures.
-	- They automatically remember where they were created by storing this information in the environment property
+	- They are a natural result of writing code that relies on lexical scope
+	- They automatically remember where they were created by storing this information in the **environment property**
+	- They become important when you can recognize and leverage closures for your own will!
 
+**Example 1:**
+Lets look at an example to dive deeper:
+```
+function foo() {
+	var a = 2;
+
+	function bar() {
+		console.log( a ); // 2
+	}
+
+	bar();
+}
+
+foo();
+```
+- In the code above, "`function bar()` has a closure (remembers its parent) over the scope of `foo()`"
+- This is because `bar()` is nested in `foo()`
+- This is a very simple example so its hard to see what the real value of this is. So lets dive deeper.
+
+**Example 2:**
+```
+function foo() {
+	var a = 2;
+
+	function bar() {
+		console.log( a );
+	}
+
+	return bar;
+}
+
+var baz = foo();
+
+baz(); // 2 -- Whoa, closure was just observed!
+```
+1. The function `bar()` has lexical scope access to its parent lexical environment, `foo()`
+2. But if we pass `bar()` as a _value_ to 
 
 
 
@@ -299,6 +339,7 @@ foo( "var b = 3;", 1 ); // 1 3
 
 
 ## Resources
+- https://javascript.info/closure
 - https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch2.md
 - https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch4.md
-- https://javascript.info/closure
+- https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch5.md
