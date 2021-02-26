@@ -275,6 +275,14 @@ foo();
 - This is a very simple example so its hard to see what the real value of this is. So lets dive deeper.
 
 **Example 2: Functions as a value let us acces lexical context _outside_ its lexical context**
+
+Remember, every Closure has 3 scopes:
+- Local Scope
+- Outer Function Scope
+- Global Scope
+
+A common mistake is not realizing that in the case where the outer function is itself a nested function, access to the outer function's scope includes the enclosing scope of the outer function—effectively creating a chain of function scopes. To demonstrate, consider the following example code.
+
 ```
 function foo() {
 	var a = 2;
@@ -303,6 +311,10 @@ baz(); // 2 -- Whoa, closure was just observed!
 	- SO? The function is being invoked well outside of its author-time lexical scope. **Closure** lets the function continue to access the lexical scope it was defined in at author-time.
 
 - 🤯 **TL;DR** any of the various ways that functions can be passed around as values and invoked in other locations, are examples of observing/exercising closure.
+
+
+
+
 ---
 
 ## Advantages
@@ -343,6 +355,9 @@ alert( counter2() ); // 1
 
 ## When to leverage Closures
 ### Closures can be leveraged to keep variables and functions private
+- Some programming languages allow you to declare private functions (that can only be called by other methods in the same class). JS does not!
+- Closures help us emulate the concept of private methods. 
+- Private methods are useful for managing the global namespace
 - We can leverage the power of closures to create private variables and functions:
 ```
 var counter = (function() {
@@ -373,8 +388,7 @@ counter.increment();
 -  ？Question: `changeBy()` is not a "closure" because it isn't hoisted like `increment()`, `decrement()`, and `value()` and doesn't require the program to remember its parent lexical environment?????
 
 - We can use closures to treat our functions like APIs that expose specific funcitons but also keep some of the logic internal and private 
-- this "Revealing module" uses closure to keep specific logic contained in a specific scope that is revealed only when its wanted:
-
+- The following example uses the module design pattern, which uses closure to keep specific logic contained in a specific scope that is revealed only when its wanted:
 ```
 function CoolModule() {
 	var something = "cool";
@@ -399,6 +413,7 @@ var foo = CoolModule();
 foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
+- This is an example of three functions sharing the ame lexical environment.
 - `CoolModule` **is a function** 
 	- that it must be invoked to create a module instance
 	- Without the execution of the outer function, the creation of the inner scope and the closures would not occur.
@@ -431,12 +446,18 @@ foo( "var b = 3;", 1 ); // 1 3
 - This strategy can be used to _dynamically_ modify the lexical scope.
 - Its bad practice _and_ it negatively impacts performance because it subverts the JS engine's automatic performance optimizations
 
+### Loops can get _loopy_
+- Prior to the introduction of the `let` keyword, closures could create issues when inside a loop.
+- If a `var` is declared inside the loop, it is hoisted, and therefore can create due to scoping.
+- (Need to dig deeper into this)
+
 ### Duplicate definitions can occur
 - duplicate definitions in the same scope are a really bad idea and will often lead to confusing results.
 - Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
 
 ### Closures prevent garbage collection
 - While a closure is active, the memory cannot be garbage collected by the JS engine
+- Its best practice not to unnecessarily create functions within other functions if closures are not needed for a particular task because it will negatively affect script performance both in terms of processing speed and memory consumption.
 - This could lead to a memory "leak" (example?)
 ---
 
