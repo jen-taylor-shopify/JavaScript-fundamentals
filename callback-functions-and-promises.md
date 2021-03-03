@@ -3,20 +3,27 @@
 ## Foundational concepts
 
 **Synchronous programming model**
-- things happen one at a time
-- a long-running action will return only when the action is finished
+- you run some code, and the result is returned as soon as the browser can do so
+- JavaScript is **single threaded** so only one thing can happen on a thread at a time and everything else is blocked until that operation completes
+- while each operation is being processed, nothing else can happen — rendering is paused
 
 **Asynchronous programming model**
 - allows multiple things to happen at the same time
 - when an action is running, the program does not wait to start the next action
 - It starts an additional "thread" (another running program whose execution may be interleaved with other programs)
+- The side-effect of this, is that you could request an image, and then try to display it before you've even received the image yet. 
+
+**2 Types of asynchronous code: **
+- old-style callbacks
+- promise-style code
 
 ## Callbacks
 
 **TL;DR** 
-- An approach to asynchronous programming.
-- Functions that perform a slow action take an extra argument, a callback function.
+- Functions that perform an action (that could be slow) take an extra argument, a callback function.
 - The action is started, and when it finishes, the callback function is called with the result.
+- Functions are passed as arguments when you call a function, which helps us to start executing additional code in the background. 
+- When the backgroundcode finishes running, it calls the callback function to let you know the work is done / something has happened
 
 **Example: setTimeout**
 ```
@@ -30,14 +37,25 @@ It becomes less useful if you perform multiple async actions in a row
 Asyncronicity is _contagious_
 - any function that calls a function that works asynchronously must itself be asynchronous and use a callback (or similar mechanism) to deliver a result
 
-## Callbacks
+**Example: Asynchronous callback**
+```
+const btn = document.querySelector('button');
 
-### “callback-based” asynchronous programming
+btn.addEventListener('click', () => {
+  alert('You clicked me!');
 
-**Callback-based asynchronous programming:**
-A function that does something asynchronously should provide a callback argument where we put the function to run after it’s complete.
+  let pElem = document.createElement('p');
+  pElem.textContent = 'This is a newly-added paragraph.';
+  document.body.appendChild(pElem);
+});
+```
+- The first argument `click` is the event listened for, and the second argument is an `callback function` that is invoked when the event is fired.
+- When we pass a callback function as an argument to another function, we are only passing the **function's reference** as an argument (it won't be executed immediately)
+- Its "called back" when the containing function is ready.
 
-Say we want to append a script to the document and load a script with a given source. You might write something like this: 
+**Example: Callback-based asynchronous programming**
+Say we want to append a script to the document and load a script with a given source. 
+You might write something like this: 
 ```
 function loadScript(src) {
   let script = document.createElement('script');
@@ -84,9 +102,7 @@ loadScript('/my/script.js', function() {
 ```
 The second argument is a function (usually but not always anonymous) that runs when the action has completed, to make sure that everything executes in the correct order.
 
-### “error-first callback” 
-
-**Error-first callbacks:**
+**Example: Error-first callbacks**
 - The first argument of the callback is reserved for an error if it occurs. Then callback(err) is called.
 - The second argument is for the successful result. Then callback(null, result1, result2…) is called.
 - This structure means that a **single callback function** is used both for reporting errors and passing back results.
@@ -117,10 +133,27 @@ loadScript('/my/script.js', function(error, script) {
 });
 ```
 
+**Example: Synchronous callbacks (`forEach()`)**
+- Not all callbacks are async — some run synchronously. 
+- An example is when we use` Array.prototype.forEach()` to loop through the items in an array
+  - The `forEach()` function calls a `callback` that you provide once for every element in an array in ascending order.  
+
+```
+const gods = ['Apollo', 'Artemis', 'Ares', 'Zeus'];
+
+gods.forEach(function (eachName, index){
+  console.log(index + '. ' + eachName);
+});
+```
+- A `forEach()` expects the paramater passed into it to be a callback function. This `callback` it accepts two arguments (`name` and `index`)
+- Unlike `map()`, which returns a new array, `forEach()` will always return `undefined`
+- It doesn't wait for anything to finish before running - it runs immediately
 
 ## What are the benefits? 
 
-
+**Callbacks are versatile**
+- They allow you to exercise more control over the order in which functions are run and what data is passed between them
+- 
 
 
 ## When would we use it? 
