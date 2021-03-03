@@ -13,6 +13,11 @@
 - It starts an additional "thread" (another running program whose execution may be interleaved with other programs)
 - The side-effect of this, is that you could request an image, and then try to display it before you've even received the image yet. 
 
+**Event Queue**
+- async operations (like promises) are put into an **event queue**
+- The event queue runs after the main thread has finished processing so that they do not block subsequent JavaScript code from running 
+- The queued operations will complete as soon as possible then return their results to the JavaScript environment
+
 **2 Types of asynchronous code: **
 - old-style callbacks
 - promise-style code
@@ -153,7 +158,6 @@ gods.forEach(function (eachName, index){
 
 **Callbacks are versatile**
 - They allow you to exercise more control over the order in which functions are run and what data is passed between them
-- 
 
 
 ## When would we use it? 
@@ -232,6 +236,61 @@ function step3(error, script) {
 
 But this is also repetitive and hard to read/follow if you're not familiar with the code. 
 This is an instance better suited for a **promise**.
+
+## Promises
+
+- **Promises** are the new style of async code in modern Web APIs.
+- **The Promise object** represents the eventual completion (or failure) of an asynchronous operation and its resulting value.
+
+**In other words:**
+- Unlike callbacks, promises takes a _single_ parameter
+- It returns a `promise`, which is like an _intermediate state_
+- It's the browser saying "I promise to get back to you with the answer as soon as I can"
+- Eventually when the response arrives the promise is fulfilled <3 
+
+**Callback vs Promise**
+- Callbacks are functions that are passed to another function
+- Promises are a returned object that you attach a callback function to
+
+**Example: `fetch()` API**
+- The `fetch()` API is a modern, more efficient version of `XMLHttpRequest`.
+- The `fetch()` method of the `WindowOrWorkerGlobalScope` mixin _starts_ the process of fetching a resource, and returns a promise that will be fulfilled once the response is available.
+- When the response object is available the promise is resolved
+
+```
+fetch('products.json').then(function(response) {
+  return response.json();
+}).then(function(json) {
+  products = json;
+  initialize();
+}).catch(function(err) {
+  console.log('Fetch problem: ' + err.message);
+});
+```
+- `fetch()` requests the `products.json` resource, and _promises_ to eventually get back to you with the resource as soon as it can
+- `.then()` is chained onto the `fetch()`. 
+  -  The `then()` method also returns a promise! When `.then()`'s promise is fulfilled or rejected, it returns a value.
+  - The first `.then()` method  contains a callback function that will run if the previous operation is successful and takes the result of the `fetch()` as its argument.
+  - ANOTHER `.then()` block is chained onto the previous `.then()` block. It is also a callback function that takes the result of the previous `.then()` function as an argument.
+  - Thats 3 chained promises!
+- the `.catch` block at the end runs if any of the `.then()` blocks fail
+
+## What are the benefits?
+- Promises are specifically made for handling async operations, and have many advantages over old-style callbacks:
+  - **Chaining**: You can chain multiple async operations together using `.then()` methods. If you tried to do the same thing with a callback function, it would result in a Pyramid of Doom
+  - **Strict Order**: Promise callbacks are always called in the strict order they are placed in the event queue
+  - **Error handling**: Its much easier ot handle errors with the **.catch()** block instead of handling them at each level of the callback function
+  - **Inversion control**: callbacks lose full control of how the function will be executed when passing a callback to a third-part library
+
+
+
+## What are the drawbacks? 
+
+## When would you use it?
+
+## When would you not use it?
+
+
 
 ## References
 - https://eloquentjavascript.net/11_async.html
