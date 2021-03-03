@@ -156,17 +156,10 @@ gods.forEach(function (eachName, index){
 
 ## What are the benefits? 
 
-**Callbacks are versatile**
-- They allow you to exercise more control over the order in which functions are run and what data is passed between them
-
-
-## When would we use it? 
-- Use setTimeout when doing something like updating an animation or checking whether something its taking longer than a given amount of time.
-- 
+- **Order control**: you can exercise more control over the order in which functions are run and what data is passed between them
 
 ## What are the drawbacks? 
-
-### Error-prone
+- **Nested individual error handling**: Error handling/failure callbacks need to be called once for each level of nesting
 - Calling a callback is more error-prone than simply returning a value
 - Needing to structure large parts of a program with callbacks isn't ideal
 
@@ -236,6 +229,10 @@ function step3(error, script) {
 
 But this is also repetitive and hard to read/follow if you're not familiar with the code. 
 This is an instance better suited for a **promise**.
+
+## When would we use it? 
+- Use setTimeout when doing something like updating an animation or checking whether something its taking longer than a given amount of time.
+- 
 
 ## Promises
 
