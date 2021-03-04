@@ -10,15 +10,14 @@
 **Asynchronous programming model**
 - allows multiple things to happen at the same time
 - when an action is running, the program does not wait to start the next action
-- It starts an additional "thread" (another running program whose execution may be interleaved with other programs)
-- The side-effect of this, is that you could request an image, and then try to display it before you've even received the image yet. 
+- it starts an additional "thread" (another running program whose execution may be interleaved with other programs)
 
 **Event Queue**
 - async operations (like promises) are put into an **event queue**
 - The event queue runs after the main thread has finished processing so that they do not block subsequent JavaScript code from running 
 - The queued operations will complete as soon as possible then return their results to the JavaScript environment
 
-**2 Types of asynchronous code: **
+**2 Types of asynchronous code:**
 - old-style callbacks
 - promise-style code
 
