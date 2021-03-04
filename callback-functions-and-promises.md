@@ -25,21 +25,27 @@
 
 **TL;DR** 
 - A callback function is a function passed into another function as an argument, which is then invoked inside the outer function to complete some kind of routine or action.
+- The function is expected to "call back" (execute) the function argument at a given time.
 - They are often used to continue code execution after an asynchronous operation has completed.
 
-**Example: setTimeout**
+**Example: An asynchronous callback**
 ```
-setTimeout(() => console.log("Tick"), 500);
+document.queryselector("#callback-btn")
+    .addEventListener("click", function() {    
+      console.log("User has clicked on the button!");
+});
 ```
-This example waits a certain number of milliseconds. Once it waits the given number of milliseconds, it calls a function.
+- This example waits until it observes the `click` event. 
+- Only once it hears the click event will it run the second argument's code.
 
 It becomes less useful if you perform multiple async actions in a row
 - this is because you have to keep passing new functions in to handle the continuation of the computation after the action
 
-Asyncronicity is _contagious_
-- any function that calls a function that works asynchronously must itself be asynchronous and use a callback (or similar mechanism) to deliver a result
+**Asyncronicity is _contagious_**
+- any function that calls a function that works asynchronously must itself be asynchronous and use a callback (or similar mechanism) to deliver a result.
+- 
 
-**Example: Asynchronous callback**
+**Example: Another asynchronous callback**
 ```
 const btn = document.querySelector('button');
 
@@ -51,11 +57,11 @@ btn.addEventListener('click', () => {
   document.body.appendChild(pElem);
 });
 ```
-- The first argument `click` is the event listened for, and the second argument is an `callback function` that is invoked when the event is fired.
+- The first argument `click` is the event listened for, and the second argument is a `callback function` that is invoked when the event is fired.
 - When we pass a callback function as an argument to another function, we are only passing the **function's reference** as an argument (it won't be executed immediately)
 - Its "called back" when the containing function is ready.
 
-**Example: Callback-based asynchronous programming**
+**Example: One more asynchronous callback**
 Say we want to append a script to the document and load a script with a given source. 
 You might write something like this: 
 ```
@@ -105,9 +111,9 @@ loadScript('/my/script.js', function() {
 The second argument is a function (usually but not always anonymous) that runs when the action has completed, to make sure that everything executes in the correct order.
 
 **Example: Error-first callbacks**
-- The first argument of the callback is reserved for an error if it occurs. Then callback(err) is called.
-- The second argument is for the successful result. Then callback(null, result1, result2…) is called.
-- This structure means that a **single callback function** is used both for reporting errors and passing back results.
+- The first argument of the callback is reserved for an error if it occurs. Then `callback(err)` is called.
+- The second argument is for the successful result. Then `callback(null, result1, result2…)` is called.
+- This structure means that a **single callback function** is used both for reporting errors _and_ passing back results.
 
 ```
 function loadScript(src, callback) {
@@ -137,8 +143,8 @@ loadScript('/my/script.js', function(error, script) {
 
 **Example: Synchronous callbacks (`forEach()`)**
 - Not all callbacks are async — some run synchronously. 
-- An example is when we use` Array.prototype.forEach()` to loop through the items in an array
-  - The `forEach()` function calls a `callback` that you provide once for every element in an array in ascending order.  
+- An example is when we use `Array.prototype.forEach()` to loop through the items in an array
+- The `forEach()` function calls a `callback` that you provide once for every element in an array in ascending order.  
 
 ```
 const gods = ['Apollo', 'Artemis', 'Ares', 'Zeus'];
@@ -151,21 +157,29 @@ gods.forEach(function (eachName, index){
 - Unlike `map()`, which returns a new array, `forEach()` will always return `undefined`
 - It doesn't wait for anything to finish before running - it runs immediately
 
-## What are the benefits? 
+## What are the benefits of callback functions? 
 
-- **Order control**: you can exercise more control over the order in which functions are run and what data is passed between them
+**Single threaded operations**
+- Callbacks allow single-threaded operations (like Javascript) to execute asynchronously.
 
-## What are the drawbacks? 
-- **Nested individual error handling**: Error handling/failure callbacks need to be called once for each level of nesting
-- Calling a callback is more error-prone than simply returning a value
-- Needing to structure large parts of a program with callbacks isn't ideal
+**Order control**
+- You can exercise more control over the order in which functions are run and what data is passed between them.
+- This is especially useful when you are waiting on something external to be retrieved before executing on it.
+- You can also defer some processing until run time based on user inputs
 
+**Access to scope** 
+- Callback functions have access to both their own scope plus the scope of the code that calls them plus the global scope of the calling code. 
+- This is useful in larger applicatoins where data is passed across several module boundaries during execution of a task.
 
-### Callback hell / Pyramid of Doom
-If you wanted to load a script, and then load another one when that one has finished loading, you can nest the call insaide a callback. 
+## What are the drawbacks of callback functions? 
 
-But when this is used for asynchronous actions that follow one after another, you quickly get into "the pyramid of doom" or "callback hell".
+**Nested individual error handling**
+- Error handling/failure callbacks need to be called once for each level of nesting
 
+**Callback hell / Pyramid of Doom**
+- If you wanted to load a script, and then load another one when that one has finished loading, you can nest the call inside a callback. 
+- But when this is used for asynchronous actions that follow one after another, you quickly get into "the pyramid of doom" or "callback hell".
+Example: 
 ```
 loadScript('1.js', function(error, script) {
 
@@ -193,7 +207,7 @@ loadScript('1.js', function(error, script) {
 ```
 - The deeper your go, the more difficult it is to manage!
 
-One way to handle this is to keep every callback a separate top-level function: 
+- One way to handle this is to keep every callback a separate top-level function: 
 ```
 loadScript('1.js', step1);
 
@@ -226,10 +240,6 @@ function step3(error, script) {
 
 But this is also repetitive and hard to read/follow if you're not familiar with the code. 
 This is an instance better suited for a **promise**.
-
-## When would we use it? 
-- Use setTimeout when doing something like updating an animation or checking whether something its taking longer than a given amount of time.
-- 
 
 ## Promises
 
