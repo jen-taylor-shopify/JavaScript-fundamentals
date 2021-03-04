@@ -24,10 +24,8 @@
 ## Callbacks
 
 **TL;DR** 
-- Functions that perform an action (that could be slow) take an extra argument, a callback function.
-- The action is started, and when it finishes, the callback function is called with the result.
-- Functions are passed as arguments when you call a function, which helps us to start executing additional code in the background. 
-- When the backgroundcode finishes running, it calls the callback function to let you know the work is done / something has happened
+- A callback function is a function passed into another function as an argument, which is then invoked inside the outer function to complete some kind of routine or action.
+- They are often used to continue code execution after an asynchronous operation has completed.
 
 **Example: setTimeout**
 ```
