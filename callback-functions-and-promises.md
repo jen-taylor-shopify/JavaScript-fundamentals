@@ -176,6 +176,13 @@ gods.forEach(function (eachName, index){
 **Nested individual error handling**
 - Error handling/failure callbacks need to be called once for each level of nesting
 
+**Inversion of control**
+- Callbacks rely on other parties to be executed
+- This means the callback could be called too early, or never at all. 
+    - The third party could fail to pass along any necessary parameters to the callback. 
+    - The callback could get called too few or too many times. Errors or exceptions could be swallowed.
+- This is why it’s important to “trust, but verify”, what comes back in the callback function.
+
 **Callback hell / Pyramid of Doom**
 - If you wanted to load a script, and then load another one when that one has finished loading, you can nest the call inside a callback. 
 - But when this is used for asynchronous actions that follow one after another, you quickly get into "the pyramid of doom" or "callback hell".
@@ -245,16 +252,19 @@ This is an instance better suited for a **promise**.
 
 - **Promises** are the new style of async code in modern Web APIs.
 - **The Promise object** represents the eventual completion (or failure) of an asynchronous operation and its resulting value.
+- So a promise is an object that may produce a single value some time in the future: either a resolved value, or a reason that it’s not resolved (e.g., a network error occurred). 
+- A promise may be in one of 3 possible states: fulfilled, rejected, or pending. 
+- You can attach callbacks to handle the fulfilled value or the reason for rejection.
+
+**Callback vs Promise**
+- Callbacks are functions that are passed to another function
+- Promises are a returned object that you can attach a callback function to
 
 **In other words:**
 - Unlike callbacks, promises takes a _single_ parameter
 - It returns a `promise`, which is like an _intermediate state_
 - It's the browser saying "I promise to get back to you with the answer as soon as I can"
 - Eventually when the response arrives the promise is fulfilled <3 
-
-**Callback vs Promise**
-- Callbacks are functions that are passed to another function
-- Promises are a returned object that you attach a callback function to
 
 **Example: `fetch()` API**
 - The `fetch()` API is a modern, more efficient version of `XMLHttpRequest`.
@@ -271,6 +281,7 @@ fetch('products.json').then(function(response) {
   console.log('Fetch problem: ' + err.message);
 });
 ```
+
 - `fetch()` requests the `products.json` resource, and _promises_ to eventually get back to you with the resource as soon as it can
 - `.then()` is chained onto the `fetch()`. 
   -  The `then()` method also returns a promise! When `.then()`'s promise is fulfilled or rejected, it returns a value.
@@ -279,24 +290,31 @@ fetch('products.json').then(function(response) {
   - Thats 3 chained promises!
 - the `.catch` block at the end runs if any of the `.then()` blocks fail
 
-## What are the benefits?
+## What are the benefits of Promises?
 - Promises are specifically made for handling async operations, and have many advantages over old-style callbacks:
-  - **Chaining**: You can chain multiple async operations together using `.then()` methods. If you tried to do the same thing with a callback function, it would result in a Pyramid of Doom
-  - **Strict Order**: Promise callbacks are always called in the strict order they are placed in the event queue
-  - **Error handling**: Its much easier ot handle errors with the **.catch()** block instead of handling them at each level of the callback function
-  - **Inversion control**: callbacks lose full control of how the function will be executed when passing a callback to a third-part library
+  - **Chaining**: You can chain multiple async operations together using `.then()` methods. If you tried to do the same thing with a callback function, it would result in a Pyramid of Doom!
+  - **Strict Order**: Promise callbacks are always called in the strict order they are placed in the event queue. It allows us to do things in a "natural order" by running a function and `.then` we write what we want to do with the result.
+  - **Error handling**: Its much easier ot handle errors with the **.catch()** block instead of handling them at each level of the callback function.
+  - **UnInversion control**: =
 
+## What are the drawbacks of Promises? 
 
+**You need to handle a promise rejection**
+- Chrome throws warning messages into the console when you forget to handle a promise rejection!
 
-## What are the drawbacks? 
-
-## When would you use it?
-
-## When would you not use it?
-
-
+**Asynchronous gap**
+- Asynchronous functions may have gaps in their execution during which other code can run
+--> Reference: https://eloquentjavascript.net/11_async.html#h_FcctcOqtcF
 
 ## References
 - https://eloquentjavascript.net/11_async.html
 - https://javascript.info/callbacks
-- 
+- https://javascript.info/promise-basics
+- https://eloquentjavascript.net/11_async.html
+- https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Concepts
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+- https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Promises
+- https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-promise-27fc71e77261
+- https://nodejs.dev/learn/understanding-javascript-promises
