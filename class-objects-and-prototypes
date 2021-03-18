@@ -1,0 +1,54 @@
+# Objects
+
+## Objects
+There are two types of objects: literal and constructed.
+- they have the exact same result
+
+**The literal form:**
+- 
+```
+var anObject = {
+   key: value;
+}
+```
+- you can add one or more key/values pairs to the literal declaration
+- usually preferred method
+
+**The constructed form:**
+```
+var anObject = newObject();
+
+myObject.key = value;
+```
+- you must add key/values one-by-one
+- does (in some cases) offer more creation options
+- less common for creating objects
+
+## Everything in JavaScript is an "object
+
+"Everything in JavaScript is an object" can be slightly misleading. 
+- Objects are 1 of the 6 priitive types.
+- Objects have sub-types (i.e. `function`)
+
+## Contents of an object
+
+Objects "contain" values. But this is also misleading
+- Objects actually contain _locations_ that point to values
+- We often refer to the "contents" of an object which implies that these values are actually stored inside the object. But this is not necessarily true.
+- What is stored in the container are these _property names_, which act as _references_ to where the values are stored.
+
+## Properties and Values
+
+Properties
+- Property names are always strings
+- If you use any other type (like a Boolean or Number), it will be converted to a string
+- Properties don't have to contain values -- they can be "accessor properties" as well, with getters/setters. 
+- Whenever a property is accessed the JS engine is actually invoking an internal `[[Get]]` operation to retrieve it, and a `[[Put]]` to set values
+- It looks for the property directly on the object, and if it doesn't find it there, will traverse the `[[Prototype]]` chain to look for it
+= Properties can be either enumerable or not, which controls if they show up in for..in loop iterations, for instance.
+
+
+Values
+- Values can be accessed as propties using `Object.propertyName` or `Object["propertyName"]` syntax
+- you can iterate over the values in a data structure using `for..of` syntax which uses the `next()` method to advance through the data modules. 
+
