@@ -164,4 +164,45 @@ alert(animal.isSleeping); // undefined (no such property in the prototype)
 - all built-in constructor functions use it
 
 ### Object.prototype
-- `let obj = {};` has built-in methods like `toString`
+- `let obj = {};` looks empty, but this `Object` has built-in methods on its constructor
+-  the `Object` has its own `prototype` that references a large object containing methods like `toString`
+-  When `new Object()` is called or a literal object `{...}` is made, the `[[Prototype]]` is set to be `Object.prototype` 
+-  So if we call `obj.toString()` the method is retrieved from the `Object.prototype`
+
+### Built-in prototypes
+- `Array`, `Date`, and `Function` also have methods in their built-in prototypes
+- `new Array()` has a constructor >> `Array.prototype` provides methods to the Array (this is very memory-efficient)
+- All built-in prototypes ladder up to the `Object.prototype`
+
+Examle of prototype inheritance tree:
+
+`null`
+
+^ `Object.prototype` 
+  `toString: function`
+  `...other object methods`
+
+^ `Array.prototype`     ^ `Function.prototype`      ^ `Number.prototype`
+   `slice: function`      `call: function`            `toFixed: function`
+   `..array methods`      `...function methods`       `...number methods`
+   
+^ `[1, 2, 3]`           ^ `function f(args) {...}`    ^ `5`
+
+We could also check the prototypical inheritance manually: 
+```
+et arr = [1, 2, 3];
+
+// it inherits from Array.prototype?
+alert( arr.__proto__ === Array.prototype ); // true
+
+// then from Object.prototype?
+alert( arr.__proto__.__proto__ === Object.prototype ); // true
+
+// and null on the top.
+alert( arr.__proto__.__proto__.__proto__ ); // null
+```
+
+>> Built-in prototypes can be modified or populated with new methods. But it’s not recommended to change them. 
+
+
+
