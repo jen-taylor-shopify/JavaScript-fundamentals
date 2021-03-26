@@ -1,7 +1,7 @@
 # Garbage collection and memory management
 
 **Garbage collection:**
-- JavaScript automatically allocates memory when objects are created, andfrees itw hen they are not used anymore.
+- JavaScript automatically allocates memory when objects are created, and frees it when they are not used anymore.
 - Danger: It can give devs the false impression that they don't need to worry about memory management.
 
 ## What is the memory life cycle?
@@ -71,6 +71,7 @@ This is where the majority of the memory management occurs.
 In **low-level languages** the developer needs to manually determine when allocated memory is no longer needed and release it.
 
 But JavaScript is a **high-level language**, and uses automatic memory management known as "garbage collection".
+It invisibly takes care of memory behind the scenes for us.
 - the garbage collector monitors memory allocation and determines when a block of allocated memory is no longer needed. Then it reclaims it! 
 - important detail: this process is an approximation because "determining whether or not a specific piece of memory is still needed is undecidable" 
   - WTF does "undecidable" mean? -> "impossible to construct an algorithm that always leads to a correct yes-or-no answer"
@@ -85,7 +86,7 @@ But JavaScript is a **high-level language**, and uses automatic memory managemen
 - **Example:** a JavaScript object has a reference to its prototype (implicit reference) and its properties values (explicit reference)
 - An object is therefore broader than just a "JavaScript object" because it also contains function scopes (or the global lexical context)
 
-### Algorithims
+### Algorithms
 
 #### Reference counting algorithm
 This is the most naive garbage collection algorithm.
@@ -141,21 +142,29 @@ function f() {
 f();
 ```
 
-#### Mark and sweep algorithm
-In this algorithm "an object is no longer needed" is defined as "an object is unreachable".
+#### Mark-and-sweep algorithm / "Reachability"
 
-It decides if the object is still needed by checking to see if it is "unreachable".
-- as of 2012 all modern brosers use the mark-and-sweep garbage collector
-- all improvements made to JS garbage collection over the last few years are improvements on this algorithm
+As of 2012 all modern browsers use the concept of "reachability" to manage memory via garbage collection.
+In this algorithm "an object is no longer needed" is defined as "an object is unreachable".
+- It decides if the object is still needed by checking to see if it is "unreachable".
 
 This algorithm assumes the knowledge of a set of objects called _roots_
 - in JavaScript the root is the global object
-- periodically the garbage collector starts at the root and finds all objects that are referenced from the roots, and objects referenced by those objects, on and on
-- It creates two categories: _reachable_ and _non-reachable_ objects
-- It removes non-reachable objects
+- periodically the garbage collector looks at the rots and "marks" (or remembers) them
+- the garbage collector starts at the root and finds all objects that are referenced from the roots, and objects referenced by those objects, on and on
+- All visited objects are remembered so as not to visit the same object twice in the future
+- This process is repeated until all reachable (from the roots) references are visited 
+- All objects except the ones marked _reachable_ are deleted
+
+Optimizations
+- JavaScript engines apply many optimizations to make it run faster and not affect the execution
+- **Generational collection** - objects are split into "new ones" and "old ones". Many objects do their job and die fast, and can be cleaned up aggressively. Those that survive for a longer period of time are marked as "old" and are examined less often by the garbage collector.
+- **Incremental collection** - if there are many objects, walking and marking the whole object set at once might take time and create delays. So the engine splits the garbage collection into pieces which are executed one-by-one. It make take extra "bookkeeping" to track the changes, but it results in lots of tiny delays instead of one big delay.
+- **Idle-time collection** - the garbage collector tries to run only while the CPU is idle to reduce effects on execution.
 
 This is an improvement over the **reference counting** algorithm because: 
 - We are sorting based on its reachability from the global context, not whether it has references or not, which is a better indicator of use. 
+  - A set of objects might reference each other (which would cause the previous algorithm to save them in memory). But if the objects themselves aren't _reachable_ from the root, then there isn't any point in saving them in memory.
   - In the example above after the function call returns, the two objects are no longer referenced by any resource that is reachable from the **global object**. 
   - Therefore, they will be found unreachable by the garbage collector and have their allocated memory reclaimed.
 
@@ -163,7 +172,15 @@ This is an improvement over the **reference counting** algorithm because:
 - In order to release the memory of an object, it needs to be _explicitly_ unreachable
 - it is not possible to explicitly trigger garbage collection in JS (yet)
 
+## TL;DR
+
+- Garbage collection is performed automatically in JS
+- objects are retained in memory while they are "reachable" from the root
+- being "referenced" is not the same as being "reachable" (i.e. a pack of interlinked objects can become unreachable)
+
+
 ## Resources
 
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management
 - https://en.wikipedia.org/wiki/Undecidable_problem 
+- https://javascript.info/garbage-collection
