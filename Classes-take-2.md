@@ -1,81 +1,139 @@
-# Classes in JavaScript
+# Classes in JavaScript 
 
-## What is a class? 
-- TL;DR: `classes` are a template for creating objects
-- In langauges like Java or Swift, a `class` is "the blueprint to create objects"
-- To bring the traditional classes to JavaScript, ES2015 standard introduces the class syntax: a syntactic sugar over the prototypal inheritance.
-- They encapsulate data and code to work on that data
+**TL;DR: **
+  -  `classes` are a template for creating objects
+  -  they encapsulate data and code to work on that data
+
 
 ## Before there were classes there were prototypes
 - JavaScript uses `prototypal inheritance`: every `object` inherits properties and methods from its `prototype object`.
 
+**Prototype Inheritance:**
+- a `prototype` is a working object instance. Objects inherit directly from other objects
+- An instance can be composed of many different source objects (you can take a property from one place, a method from another, etc etc)
+- This creates a flat **delegation hierarchy**
 
 
+**TL;DR**
+- Prototypes are loosy goosy and just go with the flow maaaaan.
 
-
-## Classes are added to ES6
-- JavaScript is not an object-oriented language, it was not designed to be one
-- In JavaScript everything is an object.
-- In JS an object is a Map data structure with some **sophisticated lookup procedures**
+## Classes are added to ES6 
+- Unlike most other languages, JavaScript’s object system is based on `prototypes`, not `classes`.
+- Although JavaScript is not an object-oriented language, aspects of object oriented programming (like the concept of `classes`) have been introduced to JS
 - To bring the traditional `classes` to JavaScript, ES2015 standard introduced the `class` syntax
+  - This is slightly misleading for developers coming from languages like Java though, because in JS `classes` don't come with any of the guarantees that a `class` was designed to provide in those OOP languages
+- The introduction of `class` syntax into a language based on `prototypes` means that developers need to clearly understand `prototypes` and `classes` to use each pattern effectively.
+
+
+In JavaScript, `class` inheritance is implemented on top of `prototypal inheritance`, **but that does not mean that it does the same thing**
+
+**Class Inheritance:**
+- a class is like a blueprint - a description of the object to be created
+- classes inherit from classes and create subclass relationships
+- these have _hierarchical class taxonomies_
+- a new instance of a `class` is instantiated via a constructor `function` with the `new` keyword
+
+**Constructors:**
+- classes have a `constructor` method (there can only be one)
+- JavaScript uses the **prototype chain** to wire the child `constructor.prototype` to the parent `constructor.prototype`
+- `constructors` can use the `super` keyword to call the `constructor` of the super class
+- This creates **single-ancestor parent/child hierarchies** and create the tightest coupling available in OO design.
+
+**TL;DR**
+- In JS  the terms "parent, child, ancestor, and descendant" do not have formal meanings like in other languages. Classes are a way of trying to emulate these formal relationships.
+
+
+
+
+- JavaScript uses `prototypal inheritance`: every `object` inherits properties and methods from its `prototype object`.
 - JS `classes` are built on top of the `prototypical inheritance`
+- You can now write the same code in two different ways: 
 
-
-Lets use the example of the classes `Car` and `SportsCar` (which inherits `Car`)
-- They both have `make` and `model` properties, and a `start` method
-- `Sportscar` has `turbocharge` property that overrides the `start` method
-
+**Prototype:**
 ```
-// 'class' declaration / constructor function
-function Car(make, model) {
-  this.make = make;
-  this.model = model;
+function GreetFriend(greeting = "Hello", name = "World") {
+  this.greeting = greeting
+  this.name = name
 }
 
-// the start method
-Car.prototype.start = function() {
-  console.log('vroom');
+GreetFriend.prototype.greet = function() {
+  return `${this.greeting}, ${this.name}!`
 }
 
-// inheritance example / constructor function 
-function SportsCar(make, model, turbocharged) {
-  Car.call(this, make, model);
-  this.turbocharged = turbocharged;
-}
-
-// actual inheritance logic
-SportsCar.prototype = Object.create(Car.prototype);
-SportsCar.prototype.constructor = SportsCar;
-
-// overriding the start method
-SportsCar.prototype.start = function() {
-  console.log('VROOOOM');
-}
-
-// Now testing the classes
-const car = new Car('Nissan', 'Sunny');
-car.start(); // vroom
-console.log(car.make); // Nissan
-
-const sportsCar = new SportsCar('Subaru', 'BRZ', true);
-sportsCar.start(); // VROOOOM
-console.log(car.turbocharged); // true
-
+const greetFriendProto = new GreetFriend("Hey", "folks")
+console.log(greetFriendProto.greet())
 ```
 
-`car.start()` does the following:
-- JS engine looks at the `car` object for a value with the key `start`
-- The `Car` object doesn't have that value
-- The JS engine asks the `car.prototype` object for a value with the key `start`
-- The `car.prototype` returns the `start` function and the JS engine executes it (`console.log('vroom');`)
+**Classes:**
+```
+class GreetFriend {
+  constructor(greeting = "Hello", name = "World") {
+    this.greeting = greeting
+    this.name = name
+  }
 
-`sportscar.start()` does the following: 
-- Firstly, the line `SportsCar.prototype = Object.create(Car.prototype);` returns a new object with the `prototype` set to whatever was passed in (in this case, the `car.prototype`)
-- JS engine looks at the `SportsCar` object for a value with the key `start`
-- The `SportsCar` object doesn't have that value
-- The JS engine asks the `sportsCar.prototype` object for a value with the key `start`
-- The `sportsCar.prototype` object doesn't have that value
-- The JS engine asks the `sportsCar.prototype.prototype` (which is the `car` object) for a value with the key `start` 
+  greet() {
+    return `${this.greeting}, ${this.name}!`
+  }
+}
+
+const greetFriend = new GreetFriend("Hey", "folks")
+
+console.log(greetFriend.greet())
+```
+
+
+**Prototypes vs Classes**
+
+**Instantiation**
+- a **`class`** defines a _type_ which can be instatinated at runtime
+- a **`prototype`** is an object instance. Instances are typically instantiated via factory functions, object literals, or `Object.create()`.
+
+**Inheritance**
+- Prototypes have flat inheritance structures.
+- Classes have hierarchical inheritance structures.
+- Why do we care? Because inheritance helps objects share code. The _way_ you share code has effects on the rest of the codebase architecture.
+- Class inheritance creates parent/child object taxonomies
+  -  widespread use of a base class leads to the "fragile base class problem"
+  -  it can be difficult to fix if you get them wrong
+
+
+Children:
+- a child of an ES6 `class` is another _type_ definition which extends the parent with new properties and methods (and are also instantiated at runtime). 
+- A child of a `prototype` is another object _instance_ which delegates any properties to the parent that aren't implemented on the child.
+
+### Advantages of using classes in JavaScript 
+**Clear syntax for users**
+  - class structure tells the user what is required for execution (of a function)
+
+**Super class calls**
+  - the `super` keyword can be used to call corresponding methods of the super `class` (i.e. `super.parentFunction()`)
+
+### Disadvantages of using classes in JavaScript
+
+**Class declarations aren't hoisted**
+  - `function declarations` are hoisted, but `class declatations` are not
+  - You must always declare your `class` **before** you access it
+
+Binding issues
+  - a class constructor requires the user to bind the `this` keyword in order to make it behave as expected 
+  - this creates issues if you try to pass your class method as a callback
+
+Performance issues 
+  - classes are more difficult for the JS Engine to optimize at runtime
+  - 
+Private variables
+  - private variables are non-existent in JS (which is one of the primary advantages of using classes in other programming langauges)
+
+4. Strict hierarchies
+  - classes create a top-to-bottomorder and changes are harder to implement
+
+5. React creators changed their minds.
+  - The deprecated the class-based components. Will be removing them in the future.
+
+
+
+
 
 
 ## Object Oriented Programming (OOP)
@@ -86,9 +144,6 @@ console.log(car.turbocharged); // true
 - reduces the complexity of software development by telling user what is required for execution (of a function)
 - translates a program's structure into an understandable syntax for users
 
-### Classes in JavaScript
-- in es6 `classes` were added to JavaScript
-- `classes` use `functions` and `prototypical inheritance` under the hood
 
 **Constructor**
 - classes have a `constructor` method
@@ -115,28 +170,6 @@ console.log(car.turbocharged); // true
 
 These two functions are the same, but one uses `classes` and one uses `prototypes`: 
 
-**Prototypes**
-```
-function Person (name) {
-  this.name = name
-}
-Person.prototype.talk = function () {
-  console.log(`${this.name} says hello`)
-}
-```
-
-**Classes:**
-```
-class Person {
-  constructor (name) {
-    this.name = name
-  }
-  
-  talk () {
-    console.log(`${this.name} says hello`)
-  }
-}
-```
 
 What is the difference between the two? 
 - The value of `this` behaves differently in each case.
@@ -148,34 +181,7 @@ A class is a blueprint for creating objects.
 - you can then make many objects with the same "blueprint"
 - its like an object creation factory
 
-## Advantages of using classes in JavaScript 
-**Clear syntax for users**
-  - class structure tells the user what is required for execution (of a function)
 
-**Super class calls**
-  - the `super` keyword can be used to call corresponding methods of the super `class` (i.e. `super.parentFunction()`)
-
-## Disadvantages of using classes in JavaScript
-
-**Class declarations aren't hoisted**
-  - `function declarations` are hoisted, but `class declatations` are not
-  - You must always declare your `class` before you access it
-
-Binding issues
-  - a class constructor requires the user to bind the `this` keyword in order to make it behave as expected 
-  - this creates issues if you try to pass your class method as a callback
-
-Performance issues 
-  - classes are more difficult for the JS Engine to optimize at runtime
-  - 
-Private variables
-  - private variables are non-existent in JS (which is one of the primary advantages of using classes in other programming langauges)
-
-4. Strict hierarchies
-  - classes create a top-to-bottomorder and changes are harder to implement
-
-5. React creators changed their minds.
-  - The deprecated the class-based components. Will be removing them in the future.
 
 
 
