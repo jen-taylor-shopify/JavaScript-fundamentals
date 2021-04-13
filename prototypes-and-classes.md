@@ -1,8 +1,9 @@
 # Prototypes vs Classes in JavaScript 
 
 **TL;DR:**
-- 
-- 
+- Classes were build on top of Prototypes
+- Classes and Prototypes are similar but not the exact same
+
 
 ## Before there were `classes` there were `prototypes`
 - JavaScript uses `prototypal inheritance`: every `object` inherits properties and methods from its `prototype object`.
@@ -112,7 +113,7 @@ alert(user.fullName); // John Smith, state of user protected
   - This is important. If we have a big `object` with many methods and several `objects` that inherit from it, when the inheriting `objects` run the inherited methods, they will modify only their own states, not the state of the big `object`.
   - As a result, methods are shared, but the `object` state is not.
 
-**Remember:**
+### Remember...
 - the value of `__proto__` can only be `null` or an `object` 
 - `__proto__` is _not the same_ as `[[Prototype]]`
   - `__proto__` is a getter/setter for the `[[Prototype]]` property
@@ -126,17 +127,12 @@ alert(user.fullName); // John Smith, state of user protected
 - An instance can be composed of many different source objects (you can take a property from one place, a method from another, etc etc)
 - This creates a flat **delegation hierarchy**
 
-
-**TL;DR**
-- Prototypes are loosy goosy and just go with the flow maaaaan.
-
 ## Classes are added to ES6 
 - Unlike most other languages, JavaScript’s object system is based on `prototypes`, not `classes`.
 - Although JavaScript is not an object-oriented language, aspects of object oriented programming (like the concept of `classes`) have been introduced to JS
 - To bring the traditional `classes` to JavaScript, ES2015 standard introduced the `class` syntax
   - This is slightly misleading for developers coming from languages like Java though, because in JS `classes` don't come with any of the guarantees that a `class` was designed to provide in those OOP languages
 - The introduction of `class` syntax into a language based on `prototypes` means that developers need to clearly understand `prototypes` and `classes` to use each pattern effectively.
-
 
 - In JS, `class` inheritance is implemented on top of `prototypal inheritance`. You can write the same code in two different ways: 
 **Prototype:**
@@ -206,9 +202,7 @@ Static:
 - the subclass inherits from the parent `class`
 - if there is a `constructor` in the subclass, it must call `super()` before using `this`
 
-
-
-## Prototypes vs Classes: Ok so what's the difference?
+## Prototypes vs Classes: What's the difference?
 - As we noted above, `class` inheritance is implemented on top of `prototypal inheritance`, **but that does not mean that it does the same thing**
 
 ### Instantiation and Inheritance
@@ -231,7 +225,7 @@ Static:
 
 ### Syntax
 **PROTOTYPES**
-- just gotta know that this secret property exists and how to use it
+- just gotta know that this hidden `[[Prototype]]` property exists and how to use it
 **CLASSES**
 - their syntax creates a clear hierarchy/relationship for developers (example: `class Rabbit extends Animal`) 
 
@@ -239,34 +233,7 @@ Static:
 - `prototypes` don’t define a type; they are themselves instances and they’re mutable at runtime, with all that implies and entails.
 - JavaScript can be a confusing mess and the addition of `classes` neither fixes it nor spares you having to understanding `prototypes`
 
-
-### Advantages of using classes in JavaScript 
-**Clear syntax for users**
-  - class structure tells the user what is required for execution (of a function)
-
-**Super class calls**
-  - the `super` keyword can be used to call corresponding methods of the super `class` (i.e. `super.parentFunction()`)
-
-### Disadvantages of using classes in JavaScript
-
-**Class declarations aren't hoisted**
-  - `function declarations` are hoisted, but `class declarations` are not
-  - You must always declare your `class` **before** you access it
-
-**Binding issues**
-  - a class constructor requires the user to bind the `this` keyword in order to make it behave as expected 
-  - this creates issues if you try to pass your class method as a callback
-
-**Performance issues**
-  - classes are more difficult for the JS Engine to optimize at runtime
-
-**Strict hierarchies**
-  - classes create a top-to-bottom order and changes are harder to implement after-the-fact
-
-**React creators changed their minds**
-  - The deprecated the class-based components. Will be removing them in the future.
-
-## Conclusion: Maybe you should just be using a factory?
+## Maybe you just need a factory?
 
 ### Factories
 Using a factory instead of a `prototype`or `class` syntax helps you:
