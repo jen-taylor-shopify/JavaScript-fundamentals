@@ -236,6 +236,11 @@ Static:
 ## Maybe you just need a factory?
 
 ### Factories
+
+A class is essentially a blueprint for creating objects.
+- We define what properties and methods an object should have, which taken together are considered a type, and then instantiate many objects using that blueprint.
+- Perhaps a more visual analogy is that a class acts as an object creation factory
+
 Using a factory instead of a `prototype`or `class` syntax helps you:
 - enforce incapsulation
 - avoid inheritance issues
