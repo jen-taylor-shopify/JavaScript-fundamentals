@@ -1,12 +1,123 @@
 # Classes in JavaScript 
 
-**TL;DR: **
+**TL;DR:**
   -  `classes` are a template for creating objects
   -  they encapsulate data and code to work on that data
 
-
 ## Before there were classes there were prototypes
 - JavaScript uses `prototypal inheritance`: every `object` inherits properties and methods from its `prototype object`.
+
+### `[[Prototype]]`
+- In JS, `objects` have a special hidden property, `[[Prototype]]` 
+  - it is either `null`
+  - or references another `object` (that object is called the `prototype`)
+- If you read a property from the `object` that doesn't exist on the `object`, JS automatically looks to see if there is a `prototype` and if the `property` exists there. 
+
+### `__proto__`
+- `[[Prototype]]` is internal and hidden, but you can access it with the special name `__proto__`
+```
+let animal = {
+  eats: true
+};
+
+let rabbit = {
+  jumps: true
+};
+
+rabbit.__proto__ = animal; // sets rabbit.[[Prototype]] = animal
+
+// we can find both properties in rabbit now:
+alert( rabbit.eats ); // true (**)
+alert( rabbit.jumps ); // true
+```
+- `animal` is the `prototype` of `rabbit` **OR** `rabbit` prototypically inherits from `animal`
+
+- the prototypes form a chain:
+```
+let animal = {
+  eats: true,
+  walk() {
+    alert("Animal walk");
+  }
+};
+
+let rabbit = {
+  jumps: true,
+  __proto__: animal
+};
+
+let longEar = {
+  earLength: 10,
+  __proto__: rabbit
+};
+
+// walk is taken from the prototype chain
+longEar.walk(); // Animal walk
+alert(longEar.jumps); // true (from rabbit)
+```
+- `__proto__` is only used for reading properties. Any writing must be done directly on the object like this:
+```
+let animal = {
+  eats: true,
+  walk() {
+    /* this method won't be used by rabbit */
+    alert("Animal walk");
+  }
+};
+
+let rabbit = {
+  __proto__: animal
+};
+
+rabbit.walk = function() {
+  alert("Rabbit bounce-bounce!");
+};
+
+rabbit.walk(); // Rabbit bounce-bounce!
+```
+- accessor properties work differently
+  - `get` accessor: a function without arguments, that works when a property is read
+  - `set` accessor: a function with one argument, that is called when the property is set
+- So writing to a `set` property is actually the same as calling a function
+
+```
+let user = {
+  name: "John",
+  surname: "Smith",
+
+  set fullName(value) {
+    [this.name, this.surname] = value.split(" ");
+  },
+
+  get fullName() {
+    return `${this.name} ${this.surname}`;
+  }
+};
+
+let admin = {
+  __proto__: user,
+  isAdmin: true
+};
+
+alert(admin.fullName); // John Smith (*)
+
+// setter triggers!
+admin.fullName = "Alice Cooper"; // (**)
+
+alert(admin.fullName); // Alice Cooper, state of admin modified
+alert(user.fullName); // John Smith, state of user protected
+```
+
+**Remember:**
+- references can't go in circles
+- the value of `__proto__` can only be `null` or an `object` 
+- `__proto__` is _not the same_ as `[[Prototype]]`
+  - `__proto__` is a getter/setter for the `[[Prototype]]` property
+  - `__proto__` is only for reading properties, **not writing properties**
+- there can only be one `[[Prototype]]` (an `object` cannot inherit from two `[[Prototypes]]`)
+
+
+
 
 **Prototype Inheritance:**
 - a `prototype` is a working object instance. Objects inherit directly from other objects
@@ -194,3 +305,4 @@ A class is a blueprint for creating objects.
 - https://medium.com/@vapurrmaid/should-you-use-classes-in-javascript-82f3b3df6195#:~:text=A%20class%20is%20a%20blueprint,as%20an%20object%20creation%20factory.
 - https://everyday.codes/javascript/please-stop-using-classes-in-javascript/
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
+- https://javascript.info/prototype-inheritance
