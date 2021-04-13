@@ -255,9 +255,6 @@ function greeterFactory(greeting = "Hello", name = "World") {
 console.log(greeterFactory("Hey", "folks").greet()) // Hey, folks!
 ```
 
-## SO?
-Should you use a `class` or a `prototype` or a `factory`?
-- which strategy will help you create the simplest solution?
 
 ## References
 - https://medium.com/@vapurrmaid/should-you-use-classes-in-javascript-82f3b3df6195#:~:text=A%20class%20is%20a%20blueprint,as%20an%20object%20creation%20factory.
