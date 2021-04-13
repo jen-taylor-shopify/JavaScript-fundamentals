@@ -207,14 +207,14 @@ Static:
 
 ### Instantiation and Inheritance
 **PROTOTYPES:**
-    - a **`prototype`** is an object instance.
-    - A child of a prototype is another object instance which delegates to the parent any properties that aren’t implemented on the child.
-    - A child of a prototype isn't a _copy_ of its prototype, its a living reference _to the prototype
-    - Prototypes have flat inheritance structures.
+ - a **`prototype`** is an object instance.
+ - A child of a prototype is another object instance which delegates to the parent any properties that aren’t implemented on the child.
+ - A child of a prototype isn't a _copy_ of its prototype, its a living reference _to the prototype
+ - Prototypes have flat inheritance structures.
 **CLASSES:**
-    - a **`class`** defines a _type_ which can be instatinated at runtime. 
-    - A child of an ES6 class is another type definition which extends the parent with new properties and methods, which in turn can be instantiated at runtime.
-    - Classes have hierarchical inheritance structures.
+  - a **`class`** defines a _type_ which can be instatinated at runtime. 
+  - A child of an ES6 class is another type definition which extends the parent with new properties and methods, which in turn can be instantiated at runtime.
+  - Classes have hierarchical inheritance structures.
 **WHY DO WE CARE?**
   - Because inheritance helps objects share code. 
   - The _way_ you share code has effects on the rest of the codebase architecture.
