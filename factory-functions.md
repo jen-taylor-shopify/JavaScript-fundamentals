@@ -12,10 +12,17 @@ In ES6 JavaScript introduced the concept of `constructors`:
   -  binds `instance.__prototype__` to `Constructor.prototype` (which binds `instance.__proto__.constructor` to `Constructor`
   -  returns `this` which refers to the new object instance
 
-### The problem with constructors
-Constructors are tricky because they _look_ like regular functions but they don't behave like a regular function. 
+**The benefits of constructors and classes:**
+- `this` refers to the new object instance
+- syntax is explicit `myFoo = newFoo()` and `extends myFoo` 
+
+**The drawbacks of constructors and classes:**
+- Constructors are tricky because they _look_ like regular functions but they don't behave like a regular function. 
 - it can't be used without the `new` keyword (and if you forget it, it often fails silently)
-- inheritance can get tricky
+- class hierarchies can easily be created with the `extends` keyword. This can lead to the **fragile base class problem** or **duplication by necessity problem**
+- refactoring can get tricky if you are trying to update a class to another type of function. Refactoring might create a breaking change.
+- breaks the **open/closed principle**: an API should be open for extension, but closed for modification
+
 
 ## Factory Functions
 The factory function is similar to a constructor
@@ -170,9 +177,64 @@ jeff.sayName() //my name is jeff
 jeff.doSomethingNerdy() // nerd stuff
 ```
 
-## Modules
-ES6 not only introduced the concept of classes, but also the concept of `modules`
+## Why factories? 
 
+**Benefits of using factories:**
+- can instantiate objects across execution contexts
+- allow for more flexible prototypal inheritance
+- refactoring is less complex than classes & constructors
+- no `new` keyword required
+- `this` behaves as it normally would (does not reference the new object instance) so you can use it to access the parent object
+
+**Drawbacks of using factories:**
+- `this` doesn't refer to the new object inside the factory
+- it **may** perform slower than a constructor function but usually this optimization is so small it rarely registers
+
+## Wait ... what about modules? 
+(not the ones introduced in ES6...we're talking about the module pattern here)
+
+Modules are similar to factory functions - the only difference is how they are created.
+
+The factory:
+```
+const calculator = () => {
+  const add = (a, b) => a + b;
+  const sub = (a, b) => a - b;
+  const mul = (a, b) => a * b;
+  const div = (a, b) => a / b;
+  return {add, sub, mul, div};
+};
+
+const myCalculator = calculator();
+
+myCalculator.add(3,5) // 8
+myCalculator.sub(6,2) // 4
+myCalculator.mul(14,5534) // 77476
+```
+
+The module: 
+```
+const calculator = (() => {
+  const add = (a, b) => a + b;
+  const sub = (a, b) => a - b;
+  const mul = (a, b) => a * b;
+  const div = (a, b) => a / b;
+  return {add, sub, mul, div};
+})();
+
+calculator.add(3,5) // 8
+calculator.sub(6,2) // 4
+calculator.mul(14,5534) // 77476
+```
+The module is exactly the same as the factory function BUT...
+- instead of creating a factory that we use over and over again to create objects the module pattern wraps the factory in an immediately invoked function expression
+- in the `Player` example earlier, the game would likely have more than one Player.
+- But in this instance we probably only want 1 calculator that we can re-use 
+- so we can assign the factory function itself to the variable `calculator` and expose the functions we will want to reuse over and over
+
+**The benfits of modules:**
+- namespacing! We can avoid naming collisions in our programs. We can prevent a function like `add` from being overwritten because it is now namespaced to `calculator`. 
 ## Resources
 - https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript/lessons/factory-functions-and-the-module-pattern
 - https://addyosmani.com/resources/essentialjsdesignpatterns/book/#constructorpatternjavascript
+- https://medium.com/javascript-scene/javascript-factory-functions-vs-constructor-functions-vs-classes-2f22ceddf33e
